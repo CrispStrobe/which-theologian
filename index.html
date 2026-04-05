@@ -58,7 +58,12 @@
   .option.selected { background:rgba(107,26,26,0.08); border-color:var(--burgundy); }
   .option.selected .opt-letter { background:var(--burgundy); color:var(--parchment); border-color:var(--burgundy); }
   .opt-letter { flex-shrink:0; width:1.7rem; height:1.7rem; border:1px solid var(--sepia-light); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.65rem; color:var(--sepia); transition:all 0.2s; margin-top:0.05rem; }
-  .opt-text { font-size:0.97rem; color:var(--ink); line-height:1.45; padding-top:0.1rem; }
+  .opt-text { font-size:0.97rem; color:var(--ink); line-height:1.45; padding-top:0.1rem; flex-grow: 1; }
+  .opt-info { margin-left: 0.5rem; position: relative; display: flex; align-items: center; }
+  .info-icon { font-size: 0.9rem; cursor: help; opacity: 0.4; transition: opacity 0.2s; }
+  .opt-info:hover .info-icon { opacity: 1; }
+  .info-tooltip { visibility: hidden; width: 180px; background-color: var(--parchment-dark); color: var(--ink); text-align: center; border: 1px solid var(--gold); border-radius: 2px; padding: 0.5rem; position: absolute; z-index: 10; bottom: 125%; right: 0; opacity: 0; transition: opacity 0.3s; font-size: 0.7rem; font-family: 'Georgia', serif; font-style: normal; pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+  .opt-info:hover .info-tooltip { visibility: visible; opacity: 1; }
   .nav { display:flex; justify-content:flex-end; margin-top:2.2rem; padding-top:1.5rem; border-top:1px solid rgba(122,92,58,0.2); gap:0.8rem; }
   .btn { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.65rem 1.6rem; border:1px solid var(--burgundy); cursor:pointer; transition:all 0.2s; border-radius:1px; }
   .btn-primary { background:var(--burgundy); color:var(--parchment); }
@@ -500,11 +505,18 @@ function renderQuestion() {
       <div class="question-number">Question ${current + 1}</div>
       <div class="question-text">${q.text}</div>
       <div class="options" id="opts">
-        ${q.options.map((o,i) => `
+        ${q.options.map((o,i) => {
+          const scoreSummary = Object.entries(o.scores).map(([k,v])=>`${theologians[k].name} (+${v})`).join(', ');
+          return `
           <div class="option ${answers[current]===i?'selected':''}" onclick="selectOption(${i})">
             <div class="opt-letter">${letters[i]}</div>
             <div class="opt-text">${o.text}</div>
-          </div>`).join('')}
+            <div class="opt-info">
+              <span class="info-icon">ℹ️</span>
+              <div class="info-tooltip">${scoreSummary}</div>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
       <div class="nav">
         ${current > 0 ? `<button class="btn btn-secondary" onclick="goBack()">← Back</button>` : ''}
