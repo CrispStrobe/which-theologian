@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Theologian Are You?</title>
+<style>
+  :root {
+    --ink: #1a0f0a;
+    --parchment: #f5ead8;
+    --parchment-dark: #e8d5b5;
+    --burgundy: #6b1a1a;
+    --burgundy-light: #8b2a2a;
+    --gold: #b8912a;
+    --gold-light: #d4aa45;
+    --sepia: #7a5c3a;
+    --sepia-light: #a07850;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a0f0a;
+    background-image: radial-gradient(ellipse at 20% 0%, #2d1810 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, #1a1020 0%, transparent 60%);
+    min-height: 100vh;
+    font-family: 'Crimson Pro', 'Georgia', 'Times New Roman', Times, serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem 4rem;
+  }
+  .book { width: 100%; max-width: 710px; }
+  .ornament { text-align:center; font-size:1.8rem; color:var(--gold); margin-bottom:0.5rem; letter-spacing:0.5rem; animation:fadeDown 1s ease both; }
+  .card {
+    background: var(--parchment);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+                      linear-gradient(180deg,#f7eedd 0%,#f2e5cc 40%,#eddfc5 100%);
+    border:1px solid var(--parchment-dark); border-radius:2px; padding:3rem 3.5rem;
+    box-shadow:0 0 0 1px var(--gold),0 0 0 4px var(--parchment-dark),0 0 0 5px var(--sepia-light),0 8px 60px rgba(0,0,0,0.6),inset 0 0 80px rgba(184,145,42,0.04);
+    animation:fadeUp 0.8s ease both; position:relative; overflow:hidden;
+  }
+  .card::before { content:'✦'; position:absolute; font-size:1.2rem; color:var(--gold); opacity:0.6; top:1.2rem; left:1.5rem; }
+  .card::after  { content:'✦'; position:absolute; font-size:1.2rem; color:var(--gold); opacity:0.6; bottom:1.2rem; right:1.5rem; }
+  .quiz-header { text-align:center; margin-bottom:2.5rem; padding-bottom:2rem; border-bottom:1px solid var(--gold); position:relative; }
+  .quiz-header::after { content:'⸻ ✦ ⸻'; position:absolute; bottom:-0.75rem; left:50%; transform:translateX(-50%); background:var(--parchment); padding:0 0.5rem; color:var(--gold); font-size:0.85rem; white-space:nowrap; }
+  .quiz-header h1 { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:1.7rem; font-weight:700; color:var(--burgundy); line-height:1.2; letter-spacing:0.02em; margin-bottom:0.8rem; }
+  .quiz-header .subtitle { font-family: 'IM Fell English', 'Georgia', serif; font-style:italic; color:var(--sepia); font-size:1.15rem; line-height:1.5; }
+  .progress-bar-wrap { margin-bottom:2rem; }
+  .progress-label { display:flex; justify-content:space-between; font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.65rem; letter-spacing:0.12em; color:var(--sepia); margin-bottom:0.4rem; text-transform:uppercase; }
+  .progress-track { height:4px; background:var(--parchment-dark); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--burgundy),var(--gold)); border-radius:2px; transition:width 0.5s cubic-bezier(.4,0,.2,1); }
+  .question-block { animation:fadeRight 0.4s ease both; }
+  .question-number { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:0.6rem; }
+  .question-text { font-family: 'IM Fell English', 'Georgia', serif; font-style: italic; font-size:1.3rem; color:var(--burgundy); line-height:1.5; margin-bottom:1.8rem; }
+  .options { display:flex; flex-direction:column; gap:0.7rem; }
+  .option { display:flex; align-items:flex-start; gap:0.9rem; padding:0.85rem 1.1rem; border:1px solid transparent; border-radius:2px; cursor:pointer; transition:all 0.2s ease; background:rgba(255,255,255,0.3); }
+  .option:hover { background:rgba(107,26,26,0.05); border-color:var(--burgundy-light); }
+  .option.selected { background:rgba(107,26,26,0.08); border-color:var(--burgundy); }
+  .option.selected .opt-letter { background:var(--burgundy); color:var(--parchment); border-color:var(--burgundy); }
+  .opt-letter { flex-shrink:0; width:1.7rem; height:1.7rem; border:1px solid var(--sepia-light); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.65rem; color:var(--sepia); transition:all 0.2s; margin-top:0.05rem; }
+  .opt-text { font-size:0.97rem; color:var(--ink); line-height:1.45; padding-top:0.1rem; }
+  .nav { display:flex; justify-content:flex-end; margin-top:2.2rem; padding-top:1.5rem; border-top:1px solid rgba(122,92,58,0.2); gap:0.8rem; }
+  .btn { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.65rem 1.6rem; border:1px solid var(--burgundy); cursor:pointer; transition:all 0.2s; border-radius:1px; }
+  .btn-primary { background:var(--burgundy); color:var(--parchment); }
+  .btn-primary:hover { background:var(--burgundy-light); border-color:var(--burgundy-light); }
+  .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-secondary { background:transparent; color:var(--sepia); border-color:var(--sepia-light); }
+  .btn-secondary:hover { background:rgba(122,92,58,0.08); }
+  
+  /* Modal Styles */
+  .info-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--burgundy);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  .info-toggle-btn:hover { transform: scale(1.1); background: var(--burgundy-light); }
+
+  .lang-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  .lang-link {
+    font-family: 'Georgia', serif;
+    font-size: 0.7rem;
+    color: var(--parchment);
+    text-decoration: none;
+    background: rgba(107, 26, 26, 0.6);
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .lang-link:hover { background: var(--burgundy); }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
+  }
+  .modal-content {
+    background-color: var(--parchment);
+    margin: 5% auto;
+    padding: 2rem;
+    border: 1px solid var(--gold);
+    width: 90%;
+    max-width: 500px;
+    border-radius: 2px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    position: relative;
+    font-family: 'Georgia', serif;
+    color: var(--ink);
+  }
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: var(--sepia);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .modal-body h2, .modal-body h3 { font-family: 'Georgia', serif; font-variant: small-caps; color: var(--burgundy); margin-bottom: 0.5rem; }
+  .modal-body h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+  .modal-body p { margin-bottom: 0.8rem; line-height: 1.5; font-size: 1rem; }
+  .modal-body hr { border: 0; border-top: 1px solid var(--gold); opacity: 0.3; margin: 1.5rem 0; }
+  .modal-body a { color: var(--burgundy); text-decoration: underline; text-decoration-color: var(--gold); }
+
+  .result-block { animation:fadeUp 0.6s ease both; text-align:center; }
+  .result-icon { font-size:3.5rem; margin-bottom:1rem; display:block; }
+  .result-label { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:0.4rem; }
+  .result-name { font-family: 'IM Fell English', 'Georgia', serif; font-style: italic; font-size:2.2rem; color:var(--burgundy); margin-bottom:0.3rem; line-height:1.1; }
+  .result-tradition { display:inline-block; font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.25rem 0.9rem; border:1px solid var(--burgundy); color:var(--burgundy); border-radius:1px; margin-bottom:0.6rem; }
+  .result-dates { font-family: 'Georgia', serif; font-size:0.9rem; color:var(--sepia); font-style:italic; margin-bottom:1.2rem; }
+  .result-divider { width:60px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:1.2rem auto; }
+  .result-desc { font-size:1.03rem; color:#3a2210; line-height:1.78; text-align:left; margin-bottom:1.5rem; }
+  .result-traits { display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-bottom:2rem; }
+  .trait { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.3rem 0.8rem; border:1px solid var(--gold); color:var(--sepia); border-radius:1px; }
+  .score-section-label { font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:0.8rem; text-align:left; }
+  .score-chart { margin:0.5rem 0 1.5rem; }
+  .score-row { margin-bottom:0.6rem; }
+  .score-row-label { display:flex; justify-content:space-between; font-family: 'Cinzel', 'Georgia', serif; font-variant: small-caps; font-size:0.57rem; letter-spacing:0.07em; color:var(--sepia); text-transform:uppercase; margin-bottom:0.2rem; }
+  .score-bar-track { height:5px; background:var(--parchment-dark); border-radius:2px; overflow:hidden; }
+  .score-bar-fill { height:100%; background:linear-gradient(90deg,var(--burgundy),var(--gold-light)); border-radius:2px; transition:width 1s cubic-bezier(.4,0,.2,1); width:0; }
+  .score-bar-fill.is-top { background:linear-gradient(90deg,var(--burgundy),var(--gold)); }
+  @keyframes fadeUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeDown  { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeRight { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+  @media(max-width:520px){ .card{padding:2rem 1.4rem;} .quiz-header h1{font-size:1.3rem;} .question-text{font-size:1.15rem;} }
+</style>
+</head>
+<body>
+<div class="lang-toggle">
+  <a href="de.html" class="lang-link">Deutsch</a>
+</div>
+
+<button id="infoBtn" class="info-toggle-btn">i</button>
+
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModal">&times;</span>
+    <div class="modal-body">
+      <h2>About this Quiz</h2>
+      <p>This quiz originates from <strong>Jordan Vale</strong> (<a href="https://substack.com/@theologymade" target="_blank">Theology Made</a>).</p>
+      <p>The German translation is provided with courtesy (<a href="https://substack.com/@theologymade/note/c-238522947?utm_source=notes-share-action&r=868noo" target="_blank">source</a>).</p>
+      <hr>
+      <h3>Imprint / Legal</h3>
+      <p><strong>Service Provider:</strong><br>
+      Christian Ströbele<br>
+      Nikolausstr. 5<br>
+      70190 Stuttgart<br>
+      Deutschland/Germany</p>
+      <p><strong>Contact:</strong><br>
+      Email: <a href="mailto:postmaster@crispstro.be">postmaster@crispstro.be</a><br>
+      Phone: 0049 176 6421 8601</p>
+      <p><strong>Responsible for Content:</strong><br>
+      Christian Ströbele<br>
+      Nikolausstr. 5<br>
+      70190 Stuttgart<br>
+      Deutschland/Germany</p>
+      <p><strong>Disclaimer:</strong><br>
+      This app is provided as is, exclusively for educational and creative purposes, without any liability.<br>
+      <a href="https://www.crispstro.be" target="_blank">www.crispstro.be</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="book">
+  <div class="ornament">✦ ✦ ✦</div>
+  <div class="card">
+    <div class="quiz-header">
+      <h1>Which Theologian Are You?</h1>
+      <p class="subtitle">Eighteen questions on grace, theosis, reason, faith &amp; the soul's journey to God</p>
+    </div>
+    <div id="quizArea"></div>
+  </div>
+</div>
+<script>
+const questions = [
+  {
+    text: "What is the primary source of Christian truth?",
+    options: [
+      { text: "Scripture alone — the written Word is the supreme and final authority.", scores: {Luther:3,Calvin:2} },
+      { text: "Scripture and Holy Tradition together, faithfully held by the Church across the ages.", scores: {Athanasius:3,Chrysostom:2,Maximus:1} },
+      { text: "Scripture, tradition, and reason in harmony — each illuminating the others.", scores: {Aquinas:3,Lewis:2,Anselm:1} },
+      { text: "The living Word of God — Christ himself, speaking freshly in every generation.", scores: {Barth:3,Bonhoeffer:1} },
+    ]
+  },
+  {
+    text: "What is the ultimate goal of the Christian life?",
+    options: [
+      { text: "Theosis — a genuine participation in the divine nature, transforming the whole person in Christ.", scores: {Maximus:3,Athanasius:2,Teresa:1} },
+      { text: "Entire sanctification — the heart wholly purified and filled with perfect love for God and neighbor.", scores: {Wesley:3} },
+      { text: "To glorify God and enjoy him forever — our chief end is his eternal praise.", scores: {Calvin:3,Edwards:2} },
+      { text: "To rest in God — our hearts are restless until they repose in him.", scores: {Augustine:3,Anselm:1} },
+    ]
+  },
+  {
+    text: "How do you think about salvation?",
+    options: [
+      { text: "God sovereignly elects his own before the foundation of the world — salvation is entirely his work.", scores: {Calvin:3,Augustine:1,Edwards:1} },
+      { text: "Grace alone, through faith alone — justification is God's free declaration, not something earned.", scores: {Luther:3,Anselm:1} },
+      { text: "Prevenient grace reaches all; we freely respond to God's prior, pursuing love.", scores: {Wesley:3} },
+      { text: "A transformation of the entire person — body, soul, and will — into the likeness of Christ.", scores: {Maximus:3,Athanasius:2,Augustine:1} },
+    ]
+  },
+  {
+    text: "What role does human reason play in faith?",
+    options: [
+      { text: "Faith seeking understanding — reason is the faithful handmaid of revealed truth.", scores: {Anselm:3,Aquinas:2} },
+      { text: "Reason and imagination together build a cumulative case for Christianity.", scores: {Lewis:3,Aquinas:1} },
+      { text: "Reason is deeply fallen; revelation alone can truly disclose who God is.", scores: {Barth:3,Luther:1} },
+      { text: "Reason illumines the natural order — but must be crowned and elevated by grace.", scores: {Aquinas:3,Maximus:1} },
+    ]
+  },
+  {
+    text: "How do you understand the Incarnation?",
+    options: [
+      { text: "God became human so that humans might become partakers of the divine nature.", scores: {Athanasius:3,Maximus:2} },
+      { text: "The Word became flesh to satisfy the debt of sin and restore our honor before God.", scores: {Anselm:3,Luther:1} },
+      { text: "In Christ, God speaks his definitive Word — the Incarnation is the center of all theology.", scores: {Barth:3,Bonhoeffer:1} },
+      { text: "The Incarnation reveals the depth of God's love and the dignity of every human person.", scores: {Chrysostom:3,Lewis:1} },
+    ]
+  },
+  {
+    text: "Which image best captures the Christian life?",
+    options: [
+      { text: "Pilgrims traveling through the City of Man toward the eternal City of God.", scores: {Augustine:3} },
+      { text: "A castle with many interior rooms — the soul journeying ever deeper toward union with God.", scores: {Teresa:3} },
+      { text: "A cosmic ascent — all of creation being gathered and lovingly offered back to its Creator.", scores: {Maximus:3,Athanasius:1} },
+      { text: "A courtroom — the guilty sinner declared righteous by the judge through faith alone.", scores: {Luther:3,Calvin:1} },
+    ]
+  },
+  {
+    text: "How do you engage with philosophy and the intellectual tradition?",
+    options: [
+      { text: "I synthesize faith and philosophy into a grand unified vision of all reality.", scores: {Aquinas:3,Maximus:1} },
+      { text: "Philosophy is a useful sparring partner — I use it to defend and illuminate the faith.", scores: {Anselm:3,Lewis:2} },
+      { text: "I am deeply wary of philosophy; God's revelation in Christ judges all human wisdom.", scores: {Barth:3,Luther:1} },
+      { text: "The wisdom of the ancient world, rightly received, can be a servant of the Gospel.", scores: {Athanasius:2,Maximus:2,Chrysostom:1} },
+    ]
+  },
+  {
+    text: "What is your view on grace?",
+    options: [
+      { text: "Sovereign, irresistible, and particular — God unconditionally elects those he saves.", scores: {Calvin:3,Edwards:1} },
+      { text: "Freely given, utterly unmerited — it transforms the soul from within across a whole lifetime.", scores: {Augustine:3,Luther:1} },
+      { text: "The felt, empowering presence of the Holy Spirit — genuinely available to all who open themselves.", scores: {Wesley:3,Teresa:1} },
+      { text: "The very energies of God, communicated to the soul through prayer and the sacraments.", scores: {Maximus:3,Athanasius:1} },
+    ]
+  },
+  {
+    text: "What is the church's primary calling?",
+    options: [
+      { text: "To preach the pure Word and rightly celebrate the sacraments — everything flows from that.", scores: {Luther:3,Calvin:1} },
+      { text: "To care for the poor, the widow, and the stranger — practical mercy is its heartbeat.", scores: {Chrysostom:3,Wesley:1,Bonhoeffer:1} },
+      { text: "To be a community of costly discipleship — the body of Christ taking form in the world.", scores: {Bonhoeffer:3} },
+      { text: "To worship God in the fullness of liturgy and sacrament, transmitting the faith whole and entire.", scores: {Athanasius:2,Maximus:2,Chrysostom:1} },
+    ]
+  },
+  {
+    text: "How do you think about the poor and wealth?",
+    options: [
+      { text: "The poor are the body of Christ — hoarding wealth while they suffer is a grave sin.", scores: {Chrysostom:3,Wesley:1} },
+      { text: "Stewardship of all we have must be rendered to God — we own nothing, we manage everything.", scores: {Calvin:3,Edwards:1} },
+      { text: "Love of neighbor means the whole of life — including economics — must be transformed.", scores: {Wesley:2,Bonhoeffer:2} },
+      { text: "Material goods are real but secondary — the soul's journey to God is what ultimately matters.", scores: {Teresa:3,Augustine:1} },
+    ]
+  },
+  {
+    text: "How do you describe prayer?",
+    options: [
+      { text: "A deep, wordless communion — the soul stilled and receptive before the divine presence.", scores: {Teresa:3,Maximus:1} },
+      { text: "Passionate, Scripture-soaked conversation with a God who has made clear and binding promises.", scores: {Luther:3,Calvin:1} },
+      { text: "The heart's affections raised toward God — love is the truest language of prayer.", scores: {Edwards:3,Augustine:1} },
+      { text: "Liturgical, communal, and sacramental — the whole Body of Christ praying with one voice.", scores: {Chrysostom:3,Athanasius:1} },
+    ]
+  },
+  {
+    text: "Which aspect of Jesus grips you most?",
+    options: [
+      { text: "His atoning sacrifice — the one who bore our sin and fully satisfied divine justice.", scores: {Anselm:3,Luther:2,Calvin:1} },
+      { text: "His resurrection — God's triumphant Yes over death and all the powers that oppose life.", scores: {Barth:3,Athanasius:2} },
+      { text: "His humanity and teaching — the Word made flesh, showing us how to live.", scores: {Lewis:3,Chrysostom:1} },
+      { text: "His cosmic lordship — the one in whom all things hold together and are finally recapitulated.", scores: {Maximus:3,Athanasius:1} },
+    ]
+  },
+  {
+    text: "How do you face seasons of doubt or spiritual dryness?",
+    options: [
+      { text: "I build arguments — if God exists, what follows? Reason clears a great deal of fog.", scores: {Lewis:3,Anselm:2} },
+      { text: "I return to the Word and its promises — not my feelings, but what God has actually said.", scores: {Luther:3,Barth:1} },
+      { text: "I press through in contemplative prayer until the darkness gradually gives way to light.", scores: {Teresa:3,Maximus:1} },
+      { text: "Doubt calls me to action — faith is tested and purified in costly obedience.", scores: {Bonhoeffer:3,Wesley:1} },
+    ]
+  },
+  {
+    text: "What draws you most to theology?",
+    options: [
+      { text: "A lifelong wrestling with sin, restlessness, and the deep hunger for God.", scores: {Augustine:3,Luther:1} },
+      { text: "A longing to know God — not merely to know about God.", scores: {Teresa:3,Edwards:2,Maximus:1} },
+      { text: "A desire to defend and articulate the faith once delivered to the saints.", scores: {Athanasius:3,Anselm:2} },
+      { text: "The overwhelming beauty and terror of God's sovereign majesty.", scores: {Edwards:3,Calvin:1} },
+    ]
+  },
+  {
+    text: "How should Christians engage the political world?",
+    options: [
+      { text: "Two kingdoms — the church must not be captured by the state, nor simply abandon it.", scores: {Luther:3,Augustine:1} },
+      { text: "All of life falls under God's sovereignty — Scripture should shape all of society.", scores: {Calvin:3,Edwards:1} },
+      { text: "When the state becomes demonic, the church must resist — even at the cost of life itself.", scores: {Bonhoeffer:3} },
+      { text: "Justice for the poor is a political demand — the church must speak plainly for the vulnerable.", scores: {Chrysostom:3,Wesley:1} },
+    ]
+  },
+  {
+    text: "What is your view of the created world?",
+    options: [
+      { text: "Creation is a gift whose deepest calling is to be offered back to God in love.", scores: {Maximus:3,Athanasius:1} },
+      { text: "Creation reflects eternal law and points, through reason, back to its Creator.", scores: {Aquinas:3,Lewis:1} },
+      { text: "Creation is fallen but redeemable — beauty remains, shot through with traces of God.", scores: {Augustine:3,Lewis:1} },
+      { text: "The world is a theatre of God's glory — his sovereignty is written into every corner of it.", scores: {Calvin:3,Edwards:2} },
+    ]
+  },
+  {
+    text: "Which theological question grips you most?",
+    options: [
+      { text: "Why do we sin so persistently, and how can grace set us finally and truly free?", scores: {Augustine:3,Luther:1} },
+      { text: "How does all of creation find its unity, its meaning, and its end in the eternal Logos?", scores: {Maximus:3,Athanasius:1} },
+      { text: "What is the soul, and how does it ascend through prayer toward union with God?", scores: {Teresa:3,Augustine:1} },
+      { text: "What does the new birth feel like — and how does genuine holiness actually grow in us?", scores: {Wesley:3,Edwards:2} },
+    ]
+  },
+  {
+    text: "Which phrase resonates most with your theological heart?",
+    options: [
+      { text: "\"Our heart is restless, until it rests in you.\" — Augustine", scores: {Augustine:3} },
+      { text: "\"He became man that we might become God.\" — Athanasius", scores: {Athanasius:3,Maximus:1} },
+      { text: "\"The Logos holds all things together — and draws all things home.\" — Maximus (paraphrase)", scores: {Maximus:3} },
+      { text: "\"Grace does not destroy nature, but perfects it.\" — Aquinas", scores: {Aquinas:3} },
+      { text: "\"Credo ut intelligam — I believe so that I may understand.\" — Anselm", scores: {Anselm:3} },
+      { text: "\"Here I stand. I can do no other.\" — Luther (traditional attribution)", scores: {Luther:3} },
+      { text: "\"We are not our own; we belong to God.\" — Calvin", scores: {Calvin:3} },
+      { text: "\"God's Word cannot be imprisoned — it must be heard anew in every generation.\" — Barth (paraphrase)", scores: {Barth:3} },
+      { text: "\"I believe in Christianity as I believe that the sun has risen: not only because I see it, but because by it I see everything else.\" — Lewis", scores: {Lewis:3} },
+      { text: "\"The soul in prayer is like one beginning to die to the world.\" — Teresa (paraphrase)", scores: {Teresa:3} },
+      { text: "\"Cheap grace is the deadly enemy of our church.\" — Bonhoeffer", scores: {Bonhoeffer:3} },
+      { text: "\"The wealth you keep is stolen from the poor.\" — Chrysostom", scores: {Chrysostom:3} },
+      { text: "\"True religion is nothing but the love of God and man.\" — Wesley (paraphrase)", scores: {Wesley:3} },
+      { text: "\"The heart has no rest until it trembles before the beauty of God.\" — Edwards (paraphrase)", scores: {Edwards:3} },
+    ]
+  }
+];
+
+const theologians = {
+  Augustine: {
+    name:"Augustine of Hippo", tradition:"Western / Catholic", dates:"354 – 430 AD", icon:"📜",
+    traits:["Original Sin","Divine Grace","City of God","Confessions","Restless Heart"],
+    desc:"You resonate deeply with Augustine — the great North African bishop whose life was a drama of restlessness and redemption. Like Augustine, you are profoundly aware of the human heart's tendency to wander, and equally convinced that only God can fill the void. You think in large, sweeping categories: two cities, two loves, two destinies. Theology, for you, is never merely academic — it is autobiographical. The hunger for beauty, truth, and rest in God is the through-line of everything you believe."
+  },
+  Athanasius: {
+    name:"Athanasius of Alexandria", tradition:"Eastern Orthodox", dates:"c. 296 – 373 AD", icon:"⛪",
+    traits:["Nicene Orthodoxy","Theosis","Incarnation","Contra Mundum","Trinity"],
+    desc:"You share the unbending conviction of Athanasius — the bishop who stood contra mundum (against the world) to defend the full divinity of Christ when almost everyone else compromised. Like Athanasius, you believe the Incarnation is everything: God truly became human so that humans might truly share in divine life. You hold the faith tenaciously, not out of stubbornness, but because you know exactly what is at stake if the Church gets it wrong. Orthodoxy is not a technicality for you — it is the difference between life and death."
+  },
+  Aquinas: {
+    name:"Thomas Aquinas", tradition:"Western / Catholic", dates:"1225 – 1274 AD", icon:"⚖️",
+    traits:["Natural Law","Faith & Reason","Summa Theologiae","Five Ways","Scholasticism"],
+    desc:"You carry the soul of Thomas Aquinas — the 'Dumb Ox' whose vast, ordered mind built a cathedral of thought out of faith and reason. Like Aquinas, you believe that grace perfects nature rather than destroying it, that philosophy and theology are allies rather than enemies, and that truth encountered anywhere ultimately belongs to God. You are patient, systematic, and convinced that reality holds together — that the created world is sacramental, pointing beyond itself to its Maker."
+  },
+  Anselm: {
+    name:"Anselm of Canterbury", tradition:"Western / Catholic", dates:"1033 – 1109 AD", icon:"🔑",
+    traits:["Fides Quaerens Intellectum","Ontological Argument","Cur Deus Homo","Satisfaction Atonement","Scholasticism"],
+    desc:"You think with the luminous precision of Anselm of Canterbury — the father of scholasticism whose motto was fides quaerens intellectum: faith seeking understanding. Like Anselm, you are not content merely to believe — you want to understand what you believe, as deeply as the mind can reach. You see no contradiction between rigorous argument and ardent faith. Your famous ontological argument was not a cold logical trick but an act of prayer — a mind in love with God, reaching for clarity about the One it loves."
+  },
+  Luther: {
+    name:"Martin Luther", tradition:"Lutheran / Protestant", dates:"1483 – 1546 AD", icon:"🔥",
+    traits:["Sola Fide","Sola Scriptura","Justification","The Reformation","Grace Alone"],
+    desc:"You carry the fire of Martin Luther — the Augustinian monk whose anguished search for a gracious God sparked the Reformation. Like Luther, you are gripped by the radical freedom of the Gospel: we are justified by grace alone, through faith alone, in Christ alone. Scripture is your supreme authority. You have little patience for religious systems that burden consciences with what God has already accomplished freely. When you stand for something, you stand — and you do not move."
+  },
+  Calvin: {
+    name:"John Calvin", tradition:"Reformed / Protestant", dates:"1509 – 1564 AD", icon:"🏛️",
+    traits:["Sovereignty of God","Predestination","TULIP","Sola Scriptura","Reformed Theology"],
+    desc:"You think with the disciplined clarity of John Calvin — the reformer of Geneva whose theology begins and ends with the absolute sovereignty of God. Like Calvin, you find comfort not in your own choosing of God, but in God's choosing of you. Scripture governs all of life: worship, politics, community, and the individual soul. You are drawn to rigorous consistency, and you want your theology to be not just true but total — a framework for seeing all of reality under the lordship of Christ."
+  },
+  Chrysostom: {
+    name:"John Chrysostom", tradition:"Eastern Orthodox", dates:"c. 349 – 407 AD", icon:"🗣️",
+    traits:["Golden Mouth","Care for the Poor","Homiletics","Social Justice","Liturgy"],
+    desc:"You burn with the eloquent passion of John Chrysostom — the 'Golden-Mouthed' preacher of Antioch and Constantinople who declared that the altar of the poor is as sacred as the altar of the Eucharist. Like Chrysostom, you cannot separate love of God from concrete love of neighbor. You preach with heat and clarity, refuse to flatter the powerful, and believe the Church's greatest test is not its doctrine but its treatment of the hungry and the homeless. For you, theology always ends in the street."
+  },
+  Maximus: {
+    name:"Maximus the Confessor", tradition:"Eastern Orthodox", dates:"c. 580 – 662 AD", icon:"✨",
+    traits:["Cosmic Christology","Theosis","Logos & Logoi","Recapitulation","Divine Energies"],
+    desc:"You think with the breathtaking cosmic vision of Maximus the Confessor — the Byzantine theologian who saw all of creation as a vast web of divine meanings (logoi) held together in the eternal Logos. Like Maximus, you believe the whole created order is moving toward its final offering-up to God in love. Christ is not merely Savior but the very axis around which the universe turns. You are drawn to synthesis: nature and grace, body and soul, time and eternity — all things ultimately reconciled and offered up in him. You believe truth is worth suffering for, and you paid the price."
+  },
+  Barth: {
+    name:"Karl Barth", tradition:"Reformed / Neo-Orthodox", dates:"1886 – 1968 AD", icon:"📖",
+    traits:["Neo-Orthodoxy","Word of God","Christocentrism","Church Dogmatics","Revelation"],
+    desc:"You think with the bold Christocentrism of Karl Barth — the Swiss theologian who said a thundering No to liberal theology and called the church back to the strange, sovereign Word of God. Like Barth, you believe theology must begin with God's self-revelation in Jesus Christ — not human experience, philosophy, or natural theology. Every theological question leads back to him. You are suspicious of systems that tame the living God, and you believe the church must hear the Word afresh in every age."
+  },
+  Edwards: {
+    name:"Jonathan Edwards", tradition:"Reformed / Calvinist", dates:"1703 – 1758 AD", icon:"⚡",
+    traits:["Religious Affections","Revival","Beauty of God","Sovereignty","Great Awakening"],
+    desc:"You share the awe-struck vision of Jonathan Edwards — the New England theologian and revivalist who experienced God's sovereignty not as cold doctrine but as overwhelming, terrible beauty. Like Edwards, you believe that true religion is not merely intellectual assent but a transformation of the affections — a new sense of the heart, enkindled by the Spirit. You have a keen eye for the glory of God shining through nature and Scripture alike, and you know that genuine revival begins when the beauty of God breaks into ordinary life."
+  },
+  Wesley: {
+    name:"John Wesley", tradition:"Methodist / Arminian", dates:"1703 – 1791 AD", icon:"🕊️",
+    traits:["Entire Sanctification","Prevenient Grace","Methodist Movement","Social Holiness","Means of Grace"],
+    desc:"You carry the warm-hearted faith of John Wesley — the Oxford don whose heart was 'strangely warmed' and who then set England ablaze with the Gospel. Like Wesley, you believe that grace is genuinely available to all, that the Christian life is a journey toward entire sanctification, and that personal holiness is inseparable from social holiness. You are both methodical and passionate — you believe in means of grace, in small groups, in accountability, and in reaching the people polite religion has left behind."
+  },
+  Lewis: {
+    name:"C.S. Lewis", tradition:"Anglican / Mere Christianity", dates:"1898 – 1963 AD", icon:"🦁",
+    traits:["Apologetics","Mere Christianity","Imagination","Joy","Reason & Faith"],
+    desc:"You share the imaginative faith of C.S. Lewis — the Oxford don whose journey from atheism to Christianity produced some of the most beloved apologetics of the twentieth century. Like Lewis, you believe reason and imagination are both paths to truth, that Joy is a clue pointing beyond itself to God, and that the Christian story is not just true but the most beautiful and coherent story on offer. You love ideas, you love stories, and you believe that helping someone see things clearly can be a deeply spiritual act."
+  },
+  Teresa: {
+    name:"Teresa of Ávila", tradition:"Catholic / Carmelite Mysticism", dates:"1515 – 1582 AD", icon:"🌹",
+    traits:["Interior Castle","Contemplative Prayer","Mysticism","Divine Union","Doctor of the Church"],
+    desc:"You are drawn into the mystical depths of Teresa of Ávila — the Spanish Carmelite reformer and Doctor of the Church whose Interior Castle mapped the soul's journey toward union with God. Like Teresa, you know that theology is ultimately about encounter, not information. Prayer is not a duty but a relationship — sometimes difficult, sometimes luminous, always essential. You have a profound sense of the soul's dignity and its capacity to be transformed by the living, indwelling presence of God."
+  },
+  Bonhoeffer: {
+    name:"Dietrich Bonhoeffer", tradition:"Lutheran / Confessing Church", dates:"1906 – 1945 AD", icon:"✝️",
+    traits:["Costly Grace","Discipleship","Ethics","Resistance","Life Together"],
+    desc:"You share the costly faith of Dietrich Bonhoeffer — the German theologian and pastor executed by the Nazis for his resistance to Hitler. Like Bonhoeffer, you believe that grace is not cheap — it demands everything. The church must take concrete form in the world; it cannot retreat into piety while the neighbor suffers. Theology, for you, is always on the way to action. You are gripped by the question: what does it actually look like to follow Jesus — not in theory, but here, now, at whatever cost?"
+  },
+};
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function getScores() {
+  const scores = {};
+  for (const k of Object.keys(theologians)) scores[k] = 0;
+  for (let i = 0; i < questions.length; i++) {
+    if (answers[i] === null) continue;
+    const opt = questions[i].options[answers[i]];
+    for (const [k, v] of Object.entries(opt.scores)) {
+      if (scores[k] !== undefined) scores[k] += v;
+    }
+  }
+  return scores;
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  const letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];
+  document.getElementById('quizArea').innerHTML = `
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>Question ${current + 1} of ${questions.length}</span>
+        <span>${pct}% complete</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="question-block">
+      <div class="question-number">Question ${current + 1}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options" id="opts">
+        ${q.options.map((o,i) => `
+          <div class="option ${answers[current]===i?'selected':''}" onclick="selectOption(${i})">
+            <div class="opt-letter">${letters[i]}</div>
+            <div class="opt-text">${o.text}</div>
+          </div>`).join('')}
+      </div>
+      <div class="nav">
+        ${current > 0 ? `<button class="btn btn-secondary" onclick="goBack()">← Back</button>` : ''}
+        <button class="btn btn-primary" id="nextBtn" onclick="goNext()" ${answers[current]===null?'disabled':''}>
+          ${current < questions.length-1 ? 'Continue →' : 'See My Result'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option').forEach((el,idx) => el.classList.toggle('selected', idx===i));
+  const btn = document.getElementById('nextBtn');
+  if (btn) btn.disabled = false;
+}
+
+function goNext() {
+  if (answers[current] === null) return;
+  if (current < questions.length-1) { current++; renderQuestion(); }
+  else renderResult();
+}
+function goBack() { if (current > 0) { current--; renderQuestion(); } }
+
+function renderResult() {
+  const scores = getScores();
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const topKey = sorted[0][0];
+  const maxPts = sorted[0][1];
+  const t = theologians[topKey];
+
+  const bars = sorted.map(([k,v],idx) => {
+    const pct = maxPts > 0 ? Math.round((v/maxPts)*100) : 0;
+    return `<div class="score-row">
+      <div class="score-row-label"><span>${theologians[k].name}</span><span>${v} pts</span></div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill ${idx===0?'is-top':''}" data-pct="${pct}" style="width:0%"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="result-block">
+      <span class="result-icon">${t.icon}</span>
+      <div class="result-label">You are most like</div>
+      <div class="result-name">${t.name}</div>
+      <div class="result-tradition">${t.tradition}</div>
+      <div class="result-dates">${t.dates}</div>
+      <div class="result-divider"></div>
+      <p class="result-desc">${t.desc}</p>
+      <div class="result-traits">${t.traits.map(tr=>`<span class="trait">${tr}</span>`).join('')}</div>
+      <div class="result-divider"></div>
+      <div class="score-section-label">Your theological affinities</div>
+      <div class="score-chart">${bars}</div>
+      <div class="nav" style="justify-content:center;margin-top:1.5rem;">
+        <button class="btn btn-primary" onclick="restartQuiz()">Take the Quiz Again</button>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+  }, 100);
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  renderQuestion();
+}
+
+// Modal Logic
+const modal = document.getElementById("infoModal");
+const infoBtn = document.getElementById("infoBtn");
+const closeBtn = document.getElementById("closeModal");
+
+infoBtn.onclick = function() { modal.style.display = "block"; }
+closeBtn.onclick = function() { modal.style.display = "none"; }
+window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+
+renderQuestion();
+</script>
+</body>
+</html>
