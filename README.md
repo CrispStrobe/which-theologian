@@ -16,21 +16,7 @@ This interactive quiz is a translated and adapted version of the original work b
 
 We do not claim any copyrights to the questions, scoring logic, or theological descriptions provided in this quiz. This repository exists solely for educational and creative purposes to provide a multilingual, privacy-focused (DSGVO/GDPR compliant) version of the original quiz.
 
-### Imprint / Legal
-
-**Service Provider:**
-Christian Ströbele
-Nikolausstr. 5
-70190 Stuttgart
-Deutschland/Germany
-
-**Contact:**
-Email: postmaster@crispstro.be
-Phone: 0049 176 6421 8601
-
-**Disclaimer:**
 This app is provided "as is", exclusively for educational and creative purposes, without any liability.
-[www.crispstro.be](https://www.crispstro.be)
 
 ## Privacy / DSGVO
 
