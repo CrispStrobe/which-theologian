@@ -729,9 +729,16 @@ infoBtn.onclick = function() { modal.style.display = "block"; }
 closeBtn.onclick = function() { modal.style.display = "none"; }
 window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
 
-// Detect language from browser
-const userLang = navigator.language || navigator.userLanguage;
-if (userLang.startsWith('de')) lang = 'de';
+// Detect language from URL or browser
+const urlParams = new URLSearchParams(window.location.search);
+const langParam = urlParams.get('lang');
+
+if (langParam && (langParam === 'en' || langParam === 'de')) {
+  lang = langParam;
+} else {
+  const userLang = navigator.language || navigator.userLanguage;
+  if (userLang.startsWith('de')) lang = 'de';
+}
 
 setLanguage(lang);
 </script>
